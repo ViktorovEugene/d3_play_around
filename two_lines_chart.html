@@ -66,23 +66,23 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var data = [
-  {index: 0, buy: 0.2, sell: 0.1},
-  {index: 1, buy: 0.4, sell: 0.13},
-  {index: 2, buy: 0.02, sell: 0.12},
-  {index: 3, buy: 0.3, sell: 0.14},
-  {index: 4, buy: 0.45, sell: 0.14},
-  {index: 5, buy: 0.44, sell: 0.14},
-  {index: 6, buy: 0.439, sell: 0.15},
-  {index: 7, buy: 0.33, sell: 0.15},
-  {index: 8, buy: 0.32, sell: 0.16},
-  {index: 9, buy: 0.3, sell: 0.15}
+  {buy: 0.2, sell: 0.1},
+  {buy: 0.4, sell: 0.13},
+  {buy: 0.02, sell: 0.12},
+  {buy: 0.3, sell: 0.14},
+  {buy: 0.45, sell: 0.14},
+  {buy: 0.44, sell: 0.14},
+  {buy: 0.439, sell: 0.15},
+  {buy: 0.33, sell: 0.15},
+  {buy: 0.32, sell: 0.16},
+  {buy: 0.3, sell: 0.10}
 ];
 
 var trades = Object.keys(color).map(function(name) {
   return {
     name: name,
-    values: data.map(function(d) {
-      return {index: d.index, value: d[name]};
+    values: data.map(function(d, i) {
+      return {index: i, value: d[name]};
 
     })
   };
@@ -99,13 +99,17 @@ svg.append("g")
     .call(yAxis);
 
 var tradeCurve = svg.selectAll(".tradeCurve")
-    .data(trades)
-  .enter().append("g")
+        .data(trades)
+        .enter();
 
 tradeCurve.append("path")
-    .attr("class", "tradeCurve")
-    .attr("d", function(d) { return line(d.values); })
-    .style("stroke", function(d) { return color[d.name]; });
+        .attr("class", "tradeCurve")
+        .attr("d", function (d) {
+          return line(d.values);
+        })
+        .style("stroke", function (d) {
+          return color[d.name];
+        });
 
 
 </script>
