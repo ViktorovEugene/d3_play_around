@@ -3,23 +3,23 @@
 <style>
 
 body {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+  font: 20px sans-serif;
 }
 
 .x.axis path {
-  display: none;
+  stroke: #000;
+  stroke-width: 3px;
 }
 
-.line {
+.y.axis path {
+  display: none;
+}
+.y.axis line {
+  stroke: #777;
+}
+
+.tradeCurve {
   fill: none;
-  stroke: steelblue;
   stroke-width: 5px;
 }
 
@@ -33,20 +33,27 @@ var margin = {top: 20, right: 80, bottom: 30, left: 50},
     height = 500 - margin.top - margin.bottom;
 
 var x = d3.scale.linear()
-    .range([0, width]);
+    .range([0, width])
+    .domain([0, 9]);
 
 var y = d3.scale.linear()
-    .range([height, 0]);
+    .range([height, 0])
+    .domain([0, 0.5]);
 
 var color = {buy: '#CD1B23', sell: '#519FCB'};
 
 var xAxis = d3.svg.axis()
     .scale(x)
+    .outerTickSize(0)
+    .ticks(0)
     .orient("bottom");
 
 var yAxis = d3.svg.axis()
     .scale(y)
-    .orient("left");
+    .orient("left")
+    .innerTickSize(-width)
+    .ticks(4)
+    .tickPadding(20);
 
 var line = d3.svg.line()
     .x(function(d) { return x(d.index); })
@@ -60,15 +67,15 @@ var svg = d3.select("body").append("svg")
 
 var data = [
   {index: 0, buy: 0.2, sell: 0.1},
-  {index: 1, buy: 0.4, sell: 0.7},
-  {index: 2, buy: 0.0, sell: 0.9},
-  {index: 3, buy: 0.3, sell: 0.1},
-  {index: 4, buy: 0.7, sell: 0.8},
-  {index: 5, buy: 0.2, sell: 0.7},
-  {index: 6, buy: 0.8, sell: 0.0},
-  {index: 7, buy: 0.6, sell: 0.7},
-  {index: 8, buy: 0.8, sell: 0.8},
-  {index: 9, buy: 0.3, sell: 0.0}
+  {index: 1, buy: 0.4, sell: 0.13},
+  {index: 2, buy: 0.02, sell: 0.12},
+  {index: 3, buy: 0.3, sell: 0.14},
+  {index: 4, buy: 0.45, sell: 0.14},
+  {index: 5, buy: 0.44, sell: 0.14},
+  {index: 6, buy: 0.439, sell: 0.15},
+  {index: 7, buy: 0.33, sell: 0.15},
+  {index: 8, buy: 0.32, sell: 0.16},
+  {index: 9, buy: 0.3, sell: 0.15}
 ];
 
 var trades = Object.keys(color).map(function(name) {
@@ -80,12 +87,7 @@ var trades = Object.keys(color).map(function(name) {
     })
   };
 });
-x.domain([0, 9]);
 
-y.domain([
-  d3.min(trades, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
-  d3.max(trades, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
-]);
 
 svg.append("g")
     .attr("class", "x axis")
@@ -96,13 +98,12 @@ svg.append("g")
     .attr("class", "y axis")
     .call(yAxis);
 
-var city = svg.selectAll(".city")
+var tradeCurve = svg.selectAll(".tradeCurve")
     .data(trades)
   .enter().append("g")
-    .attr("class", "city");
 
-city.append("path")
-    .attr("class", "line")
+tradeCurve.append("path")
+    .attr("class", "tradeCurve")
     .attr("d", function(d) { return line(d.values); })
     .style("stroke", function(d) { return color[d.name]; });
 
