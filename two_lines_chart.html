@@ -38,7 +38,7 @@ var x = d3.scale.linear()
 var y = d3.scale.linear()
     .range([height, 0]);
 
-var color = d3.scale.category10();
+var color = {buy: '#CD1B23', sell: '#519FCB'};
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -71,8 +71,7 @@ var data = [
   {index: 9, buy: 0.3, sell: 0.0}
 ];
 
-color.domain(d3.keys(data[0]).filter(function(key) { return key !== "index"; }));
-var trades = color.domain().map(function(name) {
+var trades = Object.keys(color).map(function(name) {
   return {
     name: name,
     values: data.map(function(d) {
@@ -81,7 +80,7 @@ var trades = color.domain().map(function(name) {
     })
   };
 });
-x.domain(d3.extent(data, function(d) { return d.index; }));
+x.domain([0, 9]);
 
 y.domain([
   d3.min(trades, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
@@ -105,7 +104,7 @@ var city = svg.selectAll(".city")
 city.append("path")
     .attr("class", "line")
     .attr("d", function(d) { return line(d.values); })
-    .style("stroke", function(d) { return color(d.name); });
+    .style("stroke", function(d) { return color[d.name]; });
 
 
 </script>
