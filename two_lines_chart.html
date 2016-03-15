@@ -68,20 +68,7 @@ var svg = d3.select("div").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var data_list = [
-  [
-    {buy: 0.3, sell: 0.1},
-    {buy: 0.4, sell: 0.13},
-    {buy: 0.02, sell: 0.12},
-    {buy: 0.3, sell: 0.14},
-    {buy: 0.45, sell: 0.14},
-    {buy: 0.44, sell: 0.14},
-    {buy: 0.439, sell: 0.15},
-    {buy: 0.33, sell: 0.15},
-    {buy: 0.32, sell: 0.16},
-    {buy: 0.3, sell: 0.10}
-  ],
-  [
+var data = [
     {buy: 0.2, sell: 0.1},
     {buy: 0.4, sell: 0.13},
     {buy: 0.02, sell: 0.12},
@@ -92,12 +79,10 @@ var data_list = [
     {buy: 0.23, sell: 0.15},
     {buy: 0.32, sell: 0.16},
     {buy: 0.3, sell: 0.10}
-  ]
-];
+  ];
 
-var data = data_list[0];
 d3.select('.toggle').on('click', function() {
-    data = (data == data_list[0]) ? data_list[1] : data_list[0];
+    data.unshift(data.pop());
     updateLineChart(data);
 });
 
@@ -127,7 +112,7 @@ function updateLineChart(lineChartData) {
           .append("path");
 
   tradeCurve.transition()
-          .duration(1000)
+          .duration(500)
           .attr("class", "tradeCurve")
           .attr("d", function (d) {
             return line(d.values);
