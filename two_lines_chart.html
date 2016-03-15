@@ -58,45 +58,54 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("data.tsv", function(error, data) {
-  if (error) throw error;
+var data = [
+  {index: 0, buy: 0.2, sell: 0.1},
+  {index: 1, buy: 0.4, sell: 0.7},
+  {index: 2, buy: 0.0, sell: 0.9},
+  {index: 3, buy: 0.3, sell: 0.1},
+  {index: 4, buy: 0.7, sell: 0.8},
+  {index: 5, buy: 0.2, sell: 0.7},
+  {index: 6, buy: 0.8, sell: 0.0},
+  {index: 7, buy: 0.6, sell: 0.7},
+  {index: 8, buy: 0.8, sell: 0.8},
+  {index: 9, buy: 0.3, sell: 0.0}
+];
 
-  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "index"; }));
-  var trades = color.domain().map(function(name) {
-    return {
-      name: name,
-      values: data.map(function(d) {
-        return {index: d.index, value: d[name]};
+color.domain(d3.keys(data[0]).filter(function(key) { return key !== "index"; }));
+var trades = color.domain().map(function(name) {
+  return {
+    name: name,
+    values: data.map(function(d) {
+      return {index: d.index, value: d[name]};
 
-      })
-    };
-  });
-
-  x.domain(d3.extent(data, function(d) { return d.index; }));
-
-  y.domain([
-    d3.min(trades, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
-    d3.max(trades, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
-  ]);
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
-
-  var city = svg.selectAll(".city")
-      .data(trades)
-    .enter().append("g")
-      .attr("class", "city");
-
-  city.append("path")
-      .attr("class", "line")
-      .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { return color(d.name); });
+    })
+  };
 });
+x.domain(d3.extent(data, function(d) { return d.index; }));
+
+y.domain([
+  d3.min(trades, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
+  d3.max(trades, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
+]);
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+var city = svg.selectAll(".city")
+    .data(trades)
+  .enter().append("g")
+    .attr("class", "city");
+
+city.append("path")
+    .attr("class", "line")
+    .attr("d", function(d) { return line(d.values); })
+    .style("stroke", function(d) { return color(d.name); });
+
 
 </script>
