@@ -20,7 +20,7 @@ body {
 .line {
   fill: none;
   stroke: steelblue;
-  stroke-width: 1.5px;
+  stroke-width: 5px;
 }
 
 </style>
@@ -31,8 +31,6 @@ body {
 var margin = {top: 20, right: 80, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
-
-var parseDate = d3.time.format("%Y%m%d").parse;
 
 var x = d3.scale.linear()
     .range([0, width]);
@@ -51,9 +49,8 @@ var yAxis = d3.svg.axis()
     .orient("left");
 
 var line = d3.svg.line()
-    .interpolate("basis")
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.temperature); });
+    .x(function(d) { return x(d.index); })
+    .y(function(d) { return y(d.value); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -64,26 +61,22 @@ var svg = d3.select("body").append("svg")
 d3.tsv("data.tsv", function(error, data) {
   if (error) throw error;
 
-  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
-
-  data.forEach(function(d) {
-    d.date = parseDate(d.date);
-  });
-
-  var cities = color.domain().map(function(name) {
+  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "index"; }));
+  var trades = color.domain().map(function(name) {
     return {
       name: name,
       values: data.map(function(d) {
-        return {date: d.date, temperature: +d[name]};
+        return {index: d.index, value: d[name]};
+
       })
     };
   });
 
-  x.domain(d3.extent(data, function(d) { return d.date; }));
+  x.domain(d3.extent(data, function(d) { return d.index; }));
 
   y.domain([
-    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+    d3.min(trades, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
+    d3.max(trades, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
   ]);
 
   svg.append("g")
@@ -96,7 +89,7 @@ d3.tsv("data.tsv", function(error, data) {
       .call(yAxis);
 
   var city = svg.selectAll(".city")
-      .data(cities)
+      .data(trades)
     .enter().append("g")
       .attr("class", "city");
 
