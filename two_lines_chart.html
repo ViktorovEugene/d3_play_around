@@ -25,6 +25,9 @@ body {
 
 </style>
 <body>
+<div></div>
+<br />
+<button class="toggle">toggle()</button>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
 
@@ -59,35 +62,44 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.index); })
     .y(function(d) { return y(d.value); });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("div").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var data = [
-  {buy: 0.2, sell: 0.1},
-  {buy: 0.4, sell: 0.13},
-  {buy: 0.02, sell: 0.12},
-  {buy: 0.3, sell: 0.14},
-  {buy: 0.45, sell: 0.14},
-  {buy: 0.44, sell: 0.14},
-  {buy: 0.439, sell: 0.15},
-  {buy: 0.33, sell: 0.15},
-  {buy: 0.32, sell: 0.16},
-  {buy: 0.3, sell: 0.10}
+var data_list = [
+  [
+    {buy: 0.3, sell: 0.1},
+    {buy: 0.4, sell: 0.13},
+    {buy: 0.02, sell: 0.12},
+    {buy: 0.3, sell: 0.14},
+    {buy: 0.45, sell: 0.14},
+    {buy: 0.44, sell: 0.14},
+    {buy: 0.439, sell: 0.15},
+    {buy: 0.33, sell: 0.15},
+    {buy: 0.32, sell: 0.16},
+    {buy: 0.3, sell: 0.10}
+  ],
+  [
+    {buy: 0.2, sell: 0.1},
+    {buy: 0.4, sell: 0.13},
+    {buy: 0.02, sell: 0.12},
+    {buy: 0.3, sell: 0.14},
+    {buy: 0.35, sell: 0.14},
+    {buy: 0.44, sell: 0.14},
+    {buy: 0.439, sell: 0.15},
+    {buy: 0.23, sell: 0.15},
+    {buy: 0.32, sell: 0.16},
+    {buy: 0.3, sell: 0.10}
+  ]
 ];
 
-var trades = Object.keys(color).map(function(name) {
-  return {
-    name: name,
-    values: data.map(function(d, i) {
-      return {index: i, value: d[name]};
-
-    })
-  };
+var data = data_list[0];
+d3.select('.toggle').on('click', function() {
+    data = (data == data_list[0]) ? data_list[1] : data_list[0];
+    updateLineChart(data);
 });
-
 
 svg.append("g")
     .attr("class", "x axis")
@@ -98,18 +110,30 @@ svg.append("g")
     .attr("class", "y axis")
     .call(yAxis);
 
-var tradeCurve = svg.selectAll(".tradeCurve")
-        .data(trades)
-        .enter();
+function updateLineChart(lineChartData) {
+  var trades = Object.keys(color).map(function(name) {
+    return {
+      name: name,
+      values: lineChartData.map(function(d, i) {
+        return {index: i, value: d[name]};
+      })
+    };
+  });
 
-tradeCurve.append("path")
-        .attr("class", "tradeCurve")
-        .attr("d", function (d) {
-          return line(d.values);
-        })
-        .style("stroke", function (d) {
-          return color[d.name];
-        });
+  var tradeCurve = svg.selectAll(".tradeCurve")
+          .data(trades);
 
+  tradeCurve.enter()
+          .append("path");
 
+  tradeCurve.transition()
+          .duration(1000)
+          .attr("class", "tradeCurve")
+          .attr("d", function (d) {
+            return line(d.values);
+          })
+          .style("stroke", function (d) {
+            return color[d.name];
+          });
+}
 </script>
